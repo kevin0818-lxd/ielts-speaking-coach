@@ -1,0 +1,20 @@
+{
+  "prerequisites": [
+    {"from": "good", "to": "decent"},
+    {"from": "decent", "to": "solid"},
+    {"from": "think", "to": "figure out"},
+    {"from": "say", "to": "point out"},
+    {"from": "important", "to": "crucial"},
+    {"from": "really", "to": "absolutely"}
+  ],
+  "collocations": [
+    {"from": "pretty", "to": "demanding"},
+    {"from": "highly", "to": "beneficial"},
+    {"from": "really", "to": "solid"}
+  ],
+  "semantic_neighbors": [
+    {"from": "good", "to": "worthwhile"},
+    {"from": "bad", "to": "problematic"},
+    {"from": "help", "to": "support"}
+  ]
+}
