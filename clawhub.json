@@ -1,0 +1,12 @@
+{
+  "name": "IELTS Speaking Coach",
+  "tagline": "Professional IELTS examiner: four-criterion scoring, grammar corrections, vocabulary upgrades, and spoken-register model answers",
+  "description": "An OpenClaw skill that acts as a certified IELTS Speaking Examiner and Tutor. Evaluates spoken English on Fluency & Coherence, Lexical Resource, Grammar, and Pronunciation (Band 1-9) using official descriptors. Provides evidence-based scores, grammar corrections with rule explanations, context-aware vocabulary upgrades from a curated vocab map, and spoken-register model answers. Supports Part 1 (Interview), Part 2 (Long Turn), and Part 3 (Discussion). Uses CHAI calibration for consistent scoring. Optional local fine-tuned Qwen3 model for model answer generation on Apple Silicon.",
+  "category": "productivity",
+  "tags": ["ielts", "english", "speaking", "education", "language-learning", "assessment"],
+  "version": "1.0.0",
+  "license": "MIT",
+  "pricing": "free",
+  "support_url": "https://github.com/kevin-ielts/ielts-speaking-coach/issues",
+  "homepage": "https://github.com/kevin-ielts/ielts-speaking-coach"
+}

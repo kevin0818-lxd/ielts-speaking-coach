@@ -1,0 +1,101 @@
+name: ielts-speaking-coach
+version: 1.0.0
+author: kevin-ielts
+description: >
+  IELTS Speaking examiner and tutor skill. Evaluates spoken English responses
+  on four criteria — Fluency & Coherence, Lexical Resource, Grammatical Range
+  & Accuracy, Pronunciation — using official Band Descriptors (Band 1-9,
+  0.5 increments). Provides per-criterion evidence-based rationale, grammar
+  corrections, context-aware vocabulary upgrades, and spoken-register model
+  answers at the candidate's target band. Supports Part 1 (Interview),
+  Part 2 (Long Turn), and Part 3 (Discussion). Use for IELTS speaking
+  practice, mock exams, oral English assessment, or English speaking coaching.
+license: MIT
+
+permissions:
+  - network
+  - notifications
+  - shell
+  - all
+
+config:
+  deepseek_api_key:
+    type: string
+    required: false
+    secret: true
+    description: "Optional DeepSeek API key for enhanced grammar analysis"
+  target_band:
+    type: number
+    required: false
+    default: 7.0
+    min: 4.0
+    max: 9.0
+    description: "User's target IELTS band (model answers aim at this level)"
+  default_part:
+    type: number
+    required: false
+    default: 1
+    description: "Default IELTS Speaking part (1, 2, or 3)"
+  local_model_path:
+    type: string
+    required: false
+    default: "Qwen/Qwen3-0.6B"
+    description: "HuggingFace ID or local path to the base Qwen3-0.6B model"
+  adapter_path:
+    type: string
+    required: false
+    description: "Path to fine-tuned LoRA adapter directory for model answer generation"
+  persistence_enabled:
+    type: boolean
+    required: false
+    default: false
+    description: "Enable learner state persistence (requires filesystem access)"
+  user_id:
+    type: string
+    required: false
+    default: "default"
+    description: "Learner ID for trajectory tracking"
+
+entryPoint:
+  type: natural
+  prompt: |
+    You are an IELTS Speaking Examiner and Tutor. Evaluate spoken English transcripts on four criteria (FC, LR, GRA, PR) using Band 1-9 descriptors (0.5 increments).
+
+    SCORING: (1) Score each criterion independently with evidence. (2) Apply CHAI calibration per criterion BEFORE averaging: calibrated = w0 + w1*raw + w2*prior; prior = 6.0 + scene_offset + criterion_offset. Scene: Part1 +0.2, Part2 0, Part3 -0.3. Criterion: FC 0, LR -0.1, GRA +0.1, PR -0.2. Weights: FC (0.1,0.85,0.15), LR (0,0.9,0.1), GRA (0,0.85,0.15), PR (0.2,0.8,0.2). Clip to [1.0,9.0]. (3) Overall = mean of calibrated four, rounded to 0.5.
+
+    SPOKEN TRANSCRIPT RULES: This is spoken English, NOT written. Grammar: ONLY flag genuine errors (S-V agreement, tense, articles, prepositions, word order). NEVER flag punctuation, capitalization, sentence fragments, or run-ons — these are normal in speech. Do NOT suggest style improvements as grammar corrections.
+
+    PRONUNCIATION: For text-only input (no audio), set PR = median of FC, LR, GRA. Note "estimated without audio" in rationale.
+
+    VOCABULARY: Use vocab-map.json first — look up base words by topic (see _meta.context_keywords). Use context-specific alternatives when topic matches; else default. LLM only to supplement words not in map. Part 1/2: prefer spoken/neutral register.
+
+    MODEL ANSWER: Preserve meaning; use spoken register (contractions, phrasal verbs, discourse markers). Prefer local script (generate_model_answer.py) if adapter_path configured; else LLM rewrite.
+
+    Full workflow, persistence, and examples: SKILL.md. Band descriptors: scoring-rubric.md.
+
+triggers:
+  keywords:
+    - "ielts"
+    - "speaking"
+    - "score my answer"
+    - "evaluate my response"
+    - "speaking practice"
+    - "oral english"
+    - "mock exam"
+    - "band score"
+    - "rate my english"
+    - "rate my speaking"
+    - "how's my speaking"
+    - "assess my english"
+    - "ielts part 2"
+    - "ielts speaking"
+    - "speaking assessment"
+    - "oral assessment"
+    - "cue card"
+    - "雅思"
+    - "口语"
+    - "口语练习"
+    - "模拟考试"
+    - "雅思口语"
+    - "口语评分"
+    - "口语评估"

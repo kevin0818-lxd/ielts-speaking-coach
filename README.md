@@ -1,181 +1,118 @@
 # IELTS Speaking Coach
 
-An AI-powered IELTS Speaking practice tool that records your response, transcribes it, scores it across all four IELTS criteria, and provides a model answer, vocabulary upgrades, and grammar coaching -- all in real time.
+An OpenClaw skill that acts as a professional IELTS Speaking Examiner and Tutor. Get instant, evidence-based assessment of your spoken English with actionable feedback.
 
 ## Features
 
-- **Audio recording and transcription** via Whisper ASR
-- **IELTS band scoring** with breakdown across Fluency & Coherence, Lexical Resource, Grammar, and Pronunciation
-- **Model answer generation** at your level + 1 band (i+1 principle) using spoken English register
-- **Context-aware vocabulary recommendations** that match the topic you're discussing
-- **Grammar coaching** with corrections and enhancement suggestions
-- **Ontology-driven learning trajectory** that tracks your progress and personalizes recommendations over time
-- **Text-to-speech** for model answer playback
-- **Vue 3 web frontend** -- works on any browser, mobile or desktop
+- **Four-criterion scoring** (Band 1-9, 0.5 increments): Fluency & Coherence, Lexical Resource, Grammar, Pronunciation — each with specific transcript evidence
+- **CHAI-calibrated scores**: Human-prior calibration adjusts for Part difficulty and criterion bias (Polasa et al., 2025)
+- **Grammar corrections**: Identifies genuine spoken grammar errors with minimal corrections and rule explanations
+- **Context-aware vocabulary upgrades**: Topic-specific collocational improvements, not generic thesaurus swaps
+- **Spoken-register model answers**: Rewrites at your target band using natural discourse markers, contractions, and idiomatic language
+- **All three Parts**: Part 1 (Interview), Part 2 (Long Turn), Part 3 (Discussion) with Part-specific expectations
 
-## Architecture
+## Installation
 
+```bash
+openclaw skills install ielts-speaking-coach
 ```
-Browser (Vue 3 SPA)
-    |
-    |  /api/* requests
-    v
-  Nginx (SSL + static files + reverse proxy)
-    |
-    v
-  FastAPI backend (:8080)
-    |
-    +-- Whisper ASR (transcription)
-    +-- spaCy NLP (text analysis)
-    +-- Rule-based scoring engine
-    +-- LLM evaluator (local Qwen3 or DeepSeek API)
-    +-- Ontology graph (vocabulary relationships)
-    +-- SQLite persistence (learner state)
-```
-
-## Prerequisites
-
-- Python 3.10+
-- Node.js 18+
-- ffmpeg (for audio processing)
-- ~8 GB RAM (for Whisper + spaCy models)
 
 ## Quick Start
 
-### Backend
+### Assess a response
+
+> Score my IELTS Part 1 answer: "I'm studying computer science at university. It's quite challenging but I find it rewarding because I enjoy problem-solving."
+
+The skill returns a full assessment: scores, grammar corrections, vocabulary upgrades, model answer, and study tips.
+
+### Practice session
+
+> Let's do IELTS speaking practice, Part 2
+
+The skill gives you an IELTS-style cue card, listens to your response, and provides detailed feedback.
+
+### Quick score only
+
+> Quick score: "Technology has changed our lives significantly. For instance, we can now communicate with anyone around the world instantly."
+
+Returns only the score breakdown table — no corrections or model answer.
+
+## Configuration
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `target_band` | number | 7.0 | Your target IELTS band (model answers aim at this level) |
+| `default_part` | number | 1 | Default IELTS Speaking part (1, 2, or 3) |
+| `deepseek_api_key` | string | — | Optional API key for enhanced grammar analysis |
+| `local_model_path` | string | `Qwen/Qwen3-0.6B` | Base model path for local model answer generation |
+| `adapter_path` | string | — | Path to fine-tuned LoRA adapter for spoken-register model answers |
 
 ```bash
-# Clone the repo
-git clone https://github.com/YOUR_USERNAME/ielts-speaking-coach.git
-cd ielts-speaking-coach
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Download spaCy model
-python -m spacy download en_core_web_md
-
-# Configure environment
-cp .env.example .env
-# Edit .env and add your DEEPSEEK_API_KEY (optional -- needed only if no local model)
-
-# Start the backend
-python -m uvicorn backend.main:app --host 127.0.0.1 --port 8080
+openclaw skills config ielts-speaking-coach target_band 7.5
+openclaw skills config ielts-speaking-coach default_part 2
 ```
 
-### Frontend
+## Local Model Answer Generation (Apple Silicon)
+
+This skill includes a fine-tuned Qwen3-0.6B model specifically trained for IELTS spoken-register model answer generation. It produces more natural spoken English than general-purpose LLMs because it was trained in two stages:
+
+1. **Stage 1 — Domain Adaptation**: LoRA warm-up on IELTS candidate responses and academic discussion transcripts
+2. **Stage 2 — Model Answer SFT**: Supervised fine-tuning on teacher-generated spoken-register model answers
+
+Inference uses max 768 tokens per response (`max_seq_length`); this is the generation limit, not the training sample count. See adapter training logs for the actual number of training examples.
+
+### Setup
+
+Requirements: Apple Silicon Mac, Python 3.9+, mlx-lm
 
 ```bash
-cd frontend
-npm install
-npm run dev
-# Opens at http://localhost:5173
+pip install mlx-lm
 ```
 
-For production build:
+Configure the model paths:
 
 ```bash
-npm run build
-# Deploy dist/ folder to your web server
+openclaw skills config ielts-speaking-coach local_model_path "Qwen/Qwen3-0.6B"
+openclaw skills config ielts-speaking-coach adapter_path "/path/to/your/adapter/directory"
 ```
 
-## Environment Variables
+The adapter directory should contain `adapters.safetensors` and `adapter_config.json` from the training output.
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DEEPSEEK_API_KEY` | (empty) | DeepSeek API key for LLM fallback |
-| `LOCAL_MODEL_PATH` | (empty) | Path to fine-tuned PEFT adapter |
-| `LOCAL_ENABLE_REASONING` | `0` | Enable thinking mode for local model |
-| `ONTOLOGY_TRAJECTORY_ENABLED` | `0` | Enable ontology-driven learning trajectory |
-| `TRAJECTORY_DB_PATH` | `backend/data/learner_trajectory.db` | SQLite path for learner state persistence |
+### Standalone Usage
 
-## API Endpoints
+You can also run the model answer generator directly:
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/health` | Health check |
-| `POST` | `/analyze_audio` | Upload audio for async analysis |
-| `GET` | `/task_status/{task_id}` | Poll analysis status |
-| `POST` | `/analyze` | Analyze text directly (no audio) |
-| `POST` | `/analyze_audio_sync` | Synchronous audio analysis |
-| `POST` | `/feedback_recommendation` | Accept/ignore vocabulary suggestion |
-| `POST` | `/user/word_used` | Log successful word usage |
-| `GET` | `/user/profile/{user_id}` | Get user profile and trajectory |
-| `GET` | `/user/progress/{user_id}` | Get learning progress |
-| `POST` | `/tts` | Text-to-speech for model answers |
-
-## Deployment
-
-### Nginx + SSL
-
-1. Build the frontend: `cd frontend && npm run build`
-2. Copy `dist/` contents to `/var/www/speakingcoach/`
-3. Copy `frontend/nginx-speakingcoach.conf` to `/etc/nginx/sites-available/speaking-coach`
-4. Edit the config: replace `your-domain.example.com` and SSL cert paths
-5. Enable: `ln -s /etc/nginx/sites-available/speaking-coach /etc/nginx/sites-enabled/`
-6. Test and reload: `nginx -t && nginx -s reload`
-
-### Backend as a Service
-
-Use supervisord or systemd to keep the backend running:
-
-```ini
-# /etc/supervisor/conf.d/speakingcoach.conf
-[program:speakingcoach]
-directory=/path/to/ielts-speaking-coach
-command=/path/to/venv/bin/python -m uvicorn backend.main:app --host 127.0.0.1 --port 8080
-autostart=true
-autorestart=true
-redirect_stderr=true
-stdout_logfile=/var/log/speakingcoach/app.log
-environment=PYTHONUNBUFFERED="1"
+```bash
+python scripts/generate_model_answer.py \
+  --transcript "I am a student. I study business. It is good." \
+  --part 1 \
+  --user-band 6.0 \
+  --adapter-path /path/to/adapter \
+  --json
 ```
 
-## Project Structure
+When configured, the skill automatically uses the local model for model answer generation and falls back to the built-in LLM if unavailable.
 
-```
-ielts-speaking-coach/
-  backend/
-    main.py                   # FastAPI app, scoring, recommendations
-    llm_evaluator.py          # LLM-based model answers and vocabulary
-    vocabulary_ontology.py    # Ontology graph for concept relationships
-    persistence.py            # SQLite learner state persistence
-    trajectory_planner.py     # Learning trajectory planning
-    transcribe.py             # Whisper ASR subprocess
-    features.py               # Audio feature extraction
-    models/
-      scoring_model.py        # Deep learning scoring model
-      unisep_scorer.py        # Pronunciation scoring
-    data/
-      ontology_seed.json      # Curated prerequisite relationships
-    tests/
-      test_ontology.py
-      test_persistence.py
-      test_trajectory_planner.py
-      test_api_contracts.py
-  frontend/
-    src/
-      App.vue                 # Main application layout
-      api.js                  # API client
-      composables/
-        useRecorder.js        # Browser audio recording
-      components/
-        PartSelector.vue
-        RecordingControls.vue
-        ResultCard.vue
-        ScoreBar.vue
-        VocabCard.vue
-        GrammarCard.vue
-        ModelAnswer.vue
-    nginx-speakingcoach.conf  # Production nginx config template
-  requirements.txt
-  .env.example
-  LICENSE
-```
+## How Scoring Works
+
+The skill evaluates four criteria independently using official IELTS Band Descriptors:
+
+1. **Fluency & Coherence**: Speech rate (WPM), filler density, discourse markers, coherence
+2. **Lexical Resource**: Vocabulary sophistication, semantic variety, idiomatic usage, collocations
+3. **Grammatical Range & Accuracy**: Complex structures per 18 words, error density
+4. **Pronunciation**: Self-rated or estimated at 6.0 in text-only mode
+
+Scores are calibrated using the CHAI framework (hybrid human-prior calibration) with Part-specific adjustments, then averaged and rounded to the nearest 0.5 band.
+
+## Scoring Accuracy
+
+This skill uses prompt-driven assessment — it is a study tool, not a replacement for a human examiner. Scores are most accurate for:
+
+- Band 5.0 to 8.0 responses
+- Part 1 and Part 3 (text-based criteria)
+- Grammar and Lexical Resource (directly observable in text)
+
+Pronunciation scoring requires audio input and defaults to 6.0 in text-only mode.
 
 ## License
 
