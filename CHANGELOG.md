@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.1 (2026-03)
+
+### Updated
+- Added fixed-entry IELTS speaking mode with explicit enter/exit phrases
+- Added menu-driven workflows for Part 1, Part 2, Part 3, scoring, and grammar correction
+- Standardized scoring and correction outputs with fixed Chinese templates
+- Prioritized Part 2 cue cards from `cue-cards-2025-may-aug.md`, then `cue-cards.md`
+- Added fixed topic rotation for Part 1 and Part 3 follow-up generation based on Part 2 themes
+
 ## 1.0.0 (2025-03)
 
 ### Added
