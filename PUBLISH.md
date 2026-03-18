@@ -8,26 +8,23 @@
 
 ## 步骤 1：发布到 GitHub
 
-```bash
-cd /Users/kevin/SpeakingCoachV1
+**当前状态**：skill 目录已初始化 git、完成首次 commit，remote 已指向 `https://github.com/kevin-ielts/ielts-speaking-coach.git`。
 
-# 若尚未初始化 git
-git init
-echo ".venv-mlx/
-__pycache__/
-*.pyc
-node_modules/
-.DS_Store" > .gitignore
-git add .
-git commit -m "Initial commit: IELTS Speaking Coach skill"
+你只需完成：
 
-# 在 GitHub 创建仓库后（如 https://github.com/kevin-ielts/ielts-speaking-coach）
-git remote add origin https://github.com/YOUR_USERNAME/ielts-speaking-coach.git
-git branch -M main
-git push -u origin main
-```
+1. **在 GitHub 创建仓库**（若尚未创建）  
+   - 访问 https://github.com/new  
+   - 仓库名：`ielts-speaking-coach`  
+   - 设为 Public，不要勾选「Add a README」
 
-若使用 GitHub CLI：`gh repo create ielts-speaking-coach --public --source=. --push`
+2. **推送代码**（在终端执行）：
+   ```bash
+   cd /Users/kevin/SpeakingCoachV1/ielts-speaking-coach-skill
+   git push -u origin main
+   ```
+   若使用 SSH：`git remote set-url origin git@github.com:kevin-ielts/ielts-speaking-coach.git` 后再 push。
+
+若使用 GitHub CLI：`gh repo create kevin-ielts/ielts-speaking-coach --public --source=ielts-speaking-coach-skill --push`
 
 ## 步骤 2：发布到 ClawHub
 
