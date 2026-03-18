@@ -1,45 +1,107 @@
-# IELTS Speaking Coach — 测试说明
+# IELTS Speaking Coach — Testing Guide
 
-## 快速验证
+## Quick Checks
 
-### 1. 脚本可执行性
+### 1. Entry mode
 
-```bash
-# 从项目根目录执行
-cd /path/to/SpeakingCoachV1
+Test one of these phrases:
 
-# generate_model_answer.py（需 mlx-lm，无则报错退出）
-python .cursor/skills/ielts-speaking-coach/scripts/generate_model_answer.py \
-  --transcript "I am a student. I study business." --part 1 --user-band 6.0 --json
+- `进入雅思口语模式`
+- `启动雅思口语教练`
+- `Use IELTS speaking coach`
 
-# load_trajectory.py（需 backend 可导入，否则返回空 trajectory_targets）
-ONTOLOGY_TRAJECTORY_ENABLED=1 python .cursor/skills/ielts-speaking-coach/scripts/load_trajectory.py --user-id default
+Expected result: the skill returns the fixed 1-7 menu.
 
-# update_trajectory.py（需 backend，否则静默失败）
-echo '{"text":"...","part":1,"breakdown":{...},"recommendations":[...]}' | \
-  ONTOLOGY_TRAJECTORY_ENABLED=1 python .cursor/skills/ielts-speaking-coach/scripts/update_trajectory.py --user-id default --part 1
-```
+### 2. Menu selection
 
-### 2. 依赖要求
+Reply with:
 
-| 脚本 | 必需依赖 | 无依赖时行为 |
-|------|----------|--------------|
-| generate_model_answer.py | mlx-lm | 退出码 1，提示安装 |
-| load_trajectory.py | backend (fastapi, torch, etc.) | 返回 `{"trajectory_targets":[], "error":"..."}` |
-| update_trajectory.py | backend | 静默退出或超时 |
+- `1` for Part 1
+- `2` for Part 2
+- `3` for Part 3
+- `4` for scoring
+- `5` for grammar correction
+- `6` for learning path
+- `7` for mock exam
 
-### 3. 完整环境测试
+Expected result: the skill maps numeric replies correctly.
 
-使用项目 venv（含 mlx、backend 依赖）：
+### 3. Audio pronunciation scoring
 
-```bash
-.venv-mlx/bin/python .cursor/skills/ielts-speaking-coach/scripts/generate_model_answer.py ...
-```
+Send a voice message in scoring mode.
 
-持久化脚本需 `ONTOLOGY_TRAJECTORY_ENABLED=1` 且 backend 可导入。
+Expected result:
+- ffmpeg converts audio to WAV
+- ASR transcribes the audio
+- PR score is based on ASR confidence (not estimated)
+- Output notes "PR: 音频实测" instead of "无音频估算"
 
-## 已知限制
+### 4. Text-only fallback
 
-- **generate_model_answer.py**：仅支持 Apple Silicon（MLX）；Windows/Linux 需其他实现
-- **load/update_trajectory**：依赖 backend 完整环境，沙盒或精简环境可能导入失败
-- **Pronunciation**：文本输入时 PR 为 FC/LR/GRA 中位数估计，非真实发音评分
+Send a text transcript in scoring mode (no audio).
+
+Expected result:
+- PR is estimated from median of FC, LR, GRA
+- Output notes "PR: 无音频估算"
+
+### 5. Part 2 cue card source
+
+Enter Part 2 mode and verify that the cue card comes from:
+
+1. `cue-cards-2025-may-aug.md` first
+2. `cue-cards.md` second (42 cards with difficulty tags)
+
+### 6. Scoring template
+
+Send a short transcript in scoring mode and verify the output contains:
+
+1. 总分
+2. 单项分
+3. 评分依据
+4. 主要问题
+5. 提升建议
+6. 参考改写
+7. 下一步学习方向
+
+### 7. Grammar correction template
+
+Send a sentence with a clear spoken grammar mistake and verify the output contains:
+
+1. 原句
+2. 修改后
+3. 错误说明
+4. 更自然的口语表达
+5. 一句话建议
+
+### 8. Learning path (Menu 6)
+
+Send "6" or "学习路线" and provide band scores.
+
+Expected result:
+- 当前定位
+- ZPD词汇目标 (5-8 words)
+- ZPD语法目标 (2-3 structures)
+- 话题词块
+- 每日建议
+- 阶段目标+周期
+
+### 9. Mock exam (Menu 7)
+
+Send "7" or "模拟考试".
+
+Expected result:
+- Part 1 → Part 2 → Part 3 sequential flow
+- No per-answer feedback during test
+- Final comprehensive report at the end
+
+### 10. Adaptive difficulty
+
+Test with different band levels:
+- Band 5: Should get familiar daily topics
+- Band 7: Should get abstract/hypothetical questions
+
+## Notes
+
+- This release requires `shell` permission for ffmpeg/ASR audio processing.
+- If ffmpeg is not installed, audio features will be unavailable but text-only mode still works.
+- Optional backend API at `http://host.docker.internal:8081` for persistent learning state.
