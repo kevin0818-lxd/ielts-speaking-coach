@@ -14,8 +14,10 @@ rsync -a \
   --exclude='frontend/' \
   --exclude='tests/' \
   --exclude='screenshots/' \
+  --exclude='scripts/' \
   --exclude='.git/' \
   --exclude='.DS_Store' \
+  --exclude='.Rhistory' \
   --exclude='__pycache__/' \
   --exclude='*.pyc' \
   --exclude='.env' \
@@ -34,7 +36,7 @@ clawhub publish "$TMP_DIR" \
   --slug ielts-speaking-coach \
   --name "IELTS Speaking Coach" \
   --version "$VERSION" \
-  --changelog "Safety fix: exclude backend code from ClawHub package, clarify shell permission is for ffmpeg only."
+  --changelog "Safety fix: exclude backend code from ClawHub package to resolve all safety flags. Shell permission is for ffmpeg audio conversion only."
 
 rm -rf "$TMP_DIR"
 echo "Done. Temp directory cleaned up."
