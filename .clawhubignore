@@ -1,0 +1,11 @@
+backend/
+frontend/
+tests/
+screenshots/
+.git/
+.DS_Store
+*.pyc
+__pycache__/
+.env
+.env.example
+requirements.txt

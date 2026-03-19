@@ -106,8 +106,8 @@ Scores are calibrated using the CHAI framework (hybrid human-prior calibration) 
 
 | Permission | Purpose |
 |------------|---------|
-| `network` | LLM API calls, optional backend API communication |
-| `shell` | ffmpeg audio conversion and ASR transcription for pronunciation scoring |
+| `network` | LLM API calls for scoring, feedback, and model answer generation |
+| `shell` | ffmpeg audio format conversion for pronunciation scoring from voice messages |
 
 ## Bundled Resources
 
@@ -118,6 +118,16 @@ Scores are calibrated using the CHAI framework (hybrid human-prior calibration) 
 - `pronunciation-guide.md` — Chinese speaker pronunciation diagnostics and exercises
 - `vocab-map.json` — Topic-aware vocabulary upgrade hints
 - `examples.md` — Sample interactions
+
+## Self-hosted Backend (Optional)
+
+The GitHub repository includes an optional `backend/` directory with a FastAPI server that provides enhanced features:
+
+- DL model-based precise scoring
+- Persistent learning state tracking across sessions
+- Vocabulary ontology-driven trajectory planning
+
+The backend is **not required** for the skill to work. All core features (scoring, practice, mock exam, learning paths) run entirely via the built-in LLM and bundled reference files. See the [GitHub repository](https://github.com/kevin0818-lxd/ielts-speaking-coach) for backend setup instructions.
 
 ## License
 

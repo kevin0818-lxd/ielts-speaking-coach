@@ -21,8 +21,8 @@ The skill supports:
 
 | Permission | Purpose |
 |------------|---------|
-| `network` | LLM API calls, optional backend API communication |
-| `shell` | ffmpeg audio conversion and ASR for pronunciation scoring |
+| `network` | LLM API calls for scoring, feedback, and model answer generation |
+| `shell` | ffmpeg audio format conversion for pronunciation scoring from voice messages |
 
 ## Audio Analysis
 
@@ -127,11 +127,6 @@ Fixed menu on entry:
 - `vocab-map.json` — Topic-aware vocabulary upgrades
 - `examples.md` — Sample interactions
 
-## Backend API (Optional)
+## Self-hosted Backend (Optional, GitHub only)
 
-If a backend is available at `http://host.docker.internal:8081`:
-- `POST /user/session-complete` — persist scoring results
-- `POST /learning-path` — generate ZPD learning path
-- `GET /user/learning-state/{user_id}` — retrieve learning history
-
-Falls back to LLM-only mode if backend is unreachable.
+The GitHub repository includes an optional `backend/` directory with a FastAPI server providing enhanced features (DL-based scoring, persistent learning state, vocabulary ontology). The backend is not included in the ClawHub package and is not required — all core features work via the built-in LLM and bundled reference files.

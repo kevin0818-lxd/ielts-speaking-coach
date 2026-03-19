@@ -1,5 +1,5 @@
 name: ielts-speaking-coach
-version: 1.1.0
+version: 1.1.1
 author: kevin-ielts
 description: >
   IELTS Speaking examiner and tutor skill with audio pronunciation scoring.
@@ -71,7 +71,7 @@ entryPoint:
 
     MODEL ANSWER: Spoken register, preserve meaning. Contractions, phrasal verbs, discourse markers.
 
-    BACKEND API (http://host.docker.internal:8081): POST /user/session-complete after scoring. POST /learning-path for Menu 6. GET /user/learning-state/{id} for history. Fall back to LLM if unreachable.
+    PERSISTENCE: If a backend API is available, use it for scoring persistence and learning path generation. Otherwise complete all tasks using the built-in LLM and bundled reference files.
 
     References: SKILL.md, scoring-rubric.md, learning-path.md, pronunciation-guide.md, vocab-map.json.
 

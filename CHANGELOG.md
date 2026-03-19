@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.1 (2026-03)
+
+### Fixed
+- Excluded `backend/` and `frontend/` from ClawHub package via `.clawhubignore` to resolve safety review flags (all flagged code was in the optional backend, not in the skill itself)
+- Removed hardcoded backend API URL from skill.yaml prompt; replaced with generic persistence fallback
+- Clarified `shell` permission is exclusively for ffmpeg audio conversion, not for running scripts or downloading models
+
+### Updated
+- Documentation updated to clearly separate ClawHub skill (LLM-only) from optional self-hosted backend (GitHub only)
+
 ## 1.1.0 (2026-03)
 
 ### Added
